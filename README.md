@@ -91,7 +91,7 @@ Mỗi khách hàng sẽ kích hoạt một tập luật kết hợp, tạo thàn
 - Persona: **Frequent Buyers**
 - Chiến lược: Bundle + Loyalty
 
-![Cluster 0](images/cluster_0.png.pngpng)
+![Cluster 0](images/cluster_0.png.png)
 
 ---
 
@@ -124,15 +124,14 @@ streamlit run src/app.py
 
 ## 📂 Cấu trúc dự án
 shop_cluster_nhom8/
-├── app.py
-├── README.md
-├── images/
-├── data/
-│   ├── raw/
-│   └── processed/
-├── notebooks/
-└── requirements.txt
-
+|-- app.py
+|-- README.md
+|-- images/
+|-- data/
+|   |-- raw/
+|   |-- processed/
+|-- notebooks/
+|-- requirements.txt
 ---
 
 ## ✅ Kết luận
