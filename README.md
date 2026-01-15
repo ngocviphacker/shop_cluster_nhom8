@@ -117,12 +117,13 @@ Mỗi khách hàng sẽ kích hoạt một tập luật kết hợp, tạo thàn
 
 ## 🌐 Demo ứng dụng
 🔗 **Streamlit App:**  
-http://192.168.105.248:8501
+streamlit run src/app.py
+# Mở trình duyệt: http://localhost:8501
 
 ---
 
 ## 📂 Cấu trúc dự án
-shop_cluster_nhom8/
+''' shop_cluster_nhom8/
 │
 ├── app.py
 ├── README.md
@@ -132,7 +133,7 @@ shop_cluster_nhom8/
 │ └── processed/
 ├── notebooks/
 └── requirements.txt
-
+'''
 ---
 
 ## ✅ Kết luận
