@@ -123,17 +123,16 @@ streamlit run src/app.py
 ---
 
 ## 📂 Cấu trúc dự án
-''' shop_cluster_nhom8/
-│
+shop_cluster_nhom8/
 ├── app.py
 ├── README.md
 ├── images/
 ├── data/
-│ ├── raw/
-│ └── processed/
+│   ├── raw/
+│   └── processed/
 ├── notebooks/
 └── requirements.txt
-'''
+
 ---
 
 ## ✅ Kết luận
