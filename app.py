@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 # =====================
 # PAGE CONFIG
@@ -23,21 +25,6 @@ def load_data():
 df = load_data()
 
 # =====================
-# SUMMARY + VIP
-# =====================
-summary = df.groupby("cluster").agg(
-    num_customers=("CustomerID", "nunique"),
-    avg_recency=("Recency", "mean"),
-    avg_frequency=("Frequency", "mean"),
-    avg_monetary=("Monetary", "mean")
-).reset_index()
-
-# Xác định cluster VIP (chi tiêu cao nhất)
-vip_cluster = summary.sort_values(
-    by="avg_monetary", ascending=False
-).iloc[0]["cluster"]
-
-# =====================
 # SIDEBAR
 # =====================
 st.sidebar.header("🔍 Điều khiển")
@@ -48,7 +35,59 @@ view_mode = st.sidebar.radio(
 )
 
 # =====================
-# VIEW 1: TỔNG QUAN
+# SUMMARY TABLE
+# =====================
+summary = df.groupby("cluster").agg(
+    num_customers=("CustomerID", "nunique"),
+    avg_recency=("Recency", "mean"),
+    avg_frequency=("Frequency", "mean"),
+    avg_monetary=("Monetary", "mean")
+).reset_index()
+
+# Xác định cluster VIP
+vip_cluster = summary.sort_values(
+    by="avg_monetary", ascending=False
+).iloc[0]["cluster"]
+
+# =====================
+# PCA 2D VISUALIZATION
+# =====================
+st.subheader("🧭 Không gian phân cụm 2D (PCA)")
+
+rfm = df[["Recency", "Frequency", "Monetary"]]
+
+scaler = StandardScaler()
+rfm_scaled = scaler.fit_transform(rfm)
+
+pca = PCA(n_components=2)
+pca_components = pca.fit_transform(rfm_scaled)
+
+df_pca = pd.DataFrame(
+    pca_components,
+    columns=["PC1", "PC2"]
+)
+df_pca["cluster"] = df["cluster"]
+
+fig_pca = px.scatter(
+    df_pca,
+    x="PC1",
+    y="PC2",
+    color="cluster",
+    title="Biểu đồ PCA 2D – Phân bố các Cluster",
+    opacity=0.7
+)
+
+st.plotly_chart(fig_pca, use_container_width=True)
+
+st.markdown("""
+**Nhận xét:**  
+- Các điểm dữ liệu được chiếu xuống không gian 2 chiều bằng PCA từ RFM.  
+- Một số cluster có xu hướng tách tương đối rõ, trong khi một vài cluster có chồng lấn nhẹ → phản ánh hành vi mua có phần giao thoa.  
+- Tuy PCA không giữ toàn bộ thông tin, nhưng đủ để quan sát cấu trúc tổng thể và tính hợp lý của việc phân cụm.
+""")
+
+# =====================
+# VIEW: TỔNG QUAN
 # =====================
 if view_mode == "Tổng quan":
     st.subheader("📌 Tổng quan dữ liệu")
@@ -61,7 +100,6 @@ if view_mode == "Tổng quan":
     st.subheader("📊 Thống kê theo Cluster")
     st.dataframe(summary, use_container_width=True)
 
-    st.subheader("📈 So sánh các Cluster")
     fig = px.bar(
         summary,
         x="cluster",
@@ -72,51 +110,46 @@ if view_mode == "Tổng quan":
     st.plotly_chart(fig, use_container_width=True)
 
 # =====================
-# VIEW 2: CHI TIẾT CLUSTER
+# VIEW: CHI TIẾT CLUSTER
 # =====================
 elif view_mode == "Chi tiết theo Cluster":
-    clusters = sorted(df["cluster"].unique())
     selected_cluster = st.sidebar.selectbox(
         "Chọn Cluster",
-        ["Tất cả"] + clusters
+        sorted(df["cluster"].unique())
     )
 
-    if selected_cluster == "Tất cả":
-        st.subheader("📄 Toàn bộ khách hàng")
-        st.dataframe(df.head(50), use_container_width=True)
-    else:
-        df_cluster = df[df["cluster"] == selected_cluster]
+    df_cluster = df[df["cluster"] == selected_cluster]
 
-        st.subheader(f"🧠 Phân tích Cluster {selected_cluster}")
+    st.subheader(f"🧠 Phân tích Cluster {selected_cluster}")
 
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Số khách hàng", df_cluster["CustomerID"].nunique())
-        col2.metric("Frequency TB", round(df_cluster["Frequency"].mean(), 2))
-        col3.metric("Monetary TB", round(df_cluster["Monetary"].mean(), 2))
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Số khách hàng", df_cluster["CustomerID"].nunique())
+    col2.metric("Frequency TB", round(df_cluster["Frequency"].mean(), 2))
+    col3.metric("Monetary TB", round(df_cluster["Monetary"].mean(), 2))
 
-        st.markdown("### 🎯 Persona & Chiến lược marketing")
+    st.markdown("### 🎯 Persona & Chiến lược marketing")
 
-        persona_map = {
-            0: ("Frequent Buyers", "Mua thường xuyên – Bundle + Loyalty"),
-            1: ("Premium Customers", "Chi tiêu cao – Upsell & VIP Care"),
-            2: ("Occasional Shoppers", "Ít mua – Voucher kích hoạt"),
-            3: ("Balanced Customers", "Cân bằng – Cross-sell theo ngữ cảnh"),
-        }
+    persona_map = {
+        0: ("Frequent Buyers", "Bundle sản phẩm + tích điểm"),
+        1: ("Premium Customers", "Upsell + chăm sóc VIP"),
+        2: ("Occasional Shoppers", "Voucher kích hoạt mua lại"),
+        3: ("Balanced Customers", "Cross-sell theo ngữ cảnh"),
+    }
 
-        persona, strategy = persona_map.get(
-            selected_cluster, ("Khác", "Chiến lược linh hoạt")
-        )
+    persona, strategy = persona_map.get(
+        selected_cluster, ("Khác", "Chiến lược linh hoạt")
+    )
 
-        st.markdown(f"""
-        **Persona:** {persona}  
-        **Chiến lược đề xuất:** {strategy}
-        """)
+    st.markdown(f"""
+    **Persona:** {persona}  
+    **Chiến lược đề xuất:** {strategy}
+    """)
 
-        st.subheader("📄 Một số khách hàng tiêu biểu")
-        st.dataframe(df_cluster.head(20), use_container_width=True)
+    st.subheader("📄 Một số khách hàng tiêu biểu")
+    st.dataframe(df_cluster.head(20), use_container_width=True)
 
 # =====================
-# VIEW 3: VIP CUSTOMERS
+# VIEW: VIP CUSTOMERS
 # =====================
 elif view_mode == "👑 VIP Customers":
     st.subheader(f"👑 Phân tích VIP – Cluster {vip_cluster}")
