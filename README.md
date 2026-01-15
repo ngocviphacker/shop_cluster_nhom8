@@ -75,12 +75,12 @@ Mỗi khách hàng sẽ kích hoạt một tập luật kết hợp, tạo thàn
 ## 📊 Dashboard Streamlit
 
 ### 🔹 Tổng quan dữ liệu
-![Overview](images/overview.png)
+![Overview](images/overview.png.png)
 
 ---
 
 ### 🔹 Danh sách toàn bộ khách hàng
-![All Customers](images/all_customers.png)
+![All Customers](images/all_customers.png.png)
 
 ---
 
@@ -91,7 +91,7 @@ Mỗi khách hàng sẽ kích hoạt một tập luật kết hợp, tạo thàn
 - Persona: **Frequent Buyers**
 - Chiến lược: Bundle + Loyalty
 
-![Cluster 0](images/cluster_0.png)
+![Cluster 0](images/cluster_0.png.pngpng)
 
 ---
 
@@ -102,7 +102,7 @@ Mỗi khách hàng sẽ kích hoạt một tập luật kết hợp, tạo thàn
 - Persona: **Premium Customers**
 - Chiến lược: Upsell + VIP Care
 
-![Cluster 1](images/cluster_1.png)
+![Cluster 1](images/cluster_1.png.png)
 
 ---
 
@@ -111,7 +111,7 @@ Mỗi khách hàng sẽ kích hoạt một tập luật kết hợp, tạo thàn
 - Doanh thu và tần suất cao nhất
 - Đề xuất chăm sóc riêng
 
-![VIP Customers](images/vip_customers.png)
+![VIP Customers](images/vip_customers.png.png)
 
 ---
 
